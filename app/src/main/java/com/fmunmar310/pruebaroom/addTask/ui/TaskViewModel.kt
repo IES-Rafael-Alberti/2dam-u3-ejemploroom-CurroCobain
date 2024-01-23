@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fmunmar310.pruebaroom.addTask.domain.AddTaskUseCase
 import com.fmunmar310.pruebaroom.addTask.domain.GetTasksUseCase
+import com.fmunmar310.pruebaroom.addTask.domain.DeleteTaskUseCase
+import com.fmunmar310.pruebaroom.addTask.domain.UpdateTaskUseCase
 import com.fmunmar310.pruebaroom.addTask.ui.model.TaskModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -23,6 +25,8 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class TasksViewModel @Inject constructor(
     private val addTaskUseCase: AddTaskUseCase,
+    private val updateTaskUseCase: UpdateTaskUseCase,
+    private val deleteTaskUseCase: DeleteTaskUseCase,
     getTasksUseCase: GetTasksUseCase
 ): ViewModel() {
     //El caso de uso getTasksUseCase() nos devuelve el Flow continuo y cada vez que actualice
@@ -79,6 +83,9 @@ class TasksViewModel @Inject constructor(
         //TODO: Código a eliminar. Falta desarrollar borrar tarea con un caso de uso y lanzarlo como corutina.
         //val task = _tasks.find { it.id == taskModel.id }
         //_tasks.remove(task)
+        viewModelScope.launch {
+            deleteTaskUseCase(taskModel)
+        }
     }
     fun onCheckBoxSelected(taskModel: TaskModel) {
         //TODO: Código a eliminar. Falta desarrollar actualizar tarea con un caso de uso y lanzarlo como corutina.
@@ -96,5 +103,8 @@ class TasksViewModel @Inject constructor(
         //El truco está en que no se modifica solo la propiedad selected de tasks[index],
         //sino que se vuelve a reasignar para que la vista vea que se ha actualizado un item y se recomponga.
        // _tasks[index] = _tasks[index].let { it.copy(selected = !it.selected) }
+        viewModelScope.launch {
+            updateTaskUseCase(taskModel.copy(selected = !taskModel.selected))
+        }
     }
 }
